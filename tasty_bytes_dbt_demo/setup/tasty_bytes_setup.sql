@@ -10,39 +10,43 @@ CREATE OR REPLACE WAREHOUSE tasty_bytes_dbt_wh
 
 USE WAREHOUSE tasty_bytes_dbt_wh;
 
-CREATE DATABASE IF NOT EXISTS tasty_bytes_dbt_db;
-CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.raw;
-CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.dev;
-CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.prod;
+CREATE DATABASE IF NOT EXISTS SJEGOU_DB;
+CREATE OR REPLACE SCHEMA SJEGOU_DB.raw;
+CREATE OR REPLACE SCHEMA SJEGOU_DB.DBT_DEV;
+CREATE OR REPLACE SCHEMA SJEGOU_DB.DBT_PROD;
 
 
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET LOG_LEVEL = 'INFO';
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET TRACE_LEVEL = 'ALWAYS';
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET METRIC_LEVEL = 'ALL';
+ALTER SCHEMA SJEGOU_DB.DBT_DEV SET LOG_LEVEL = 'INFO';
+ALTER SCHEMA SJEGOU_DB.DBT_DEV SET TRACE_LEVEL = 'ALWAYS';
+ALTER SCHEMA SJEGOU_DB.DBT_DEV SET METRIC_LEVEL = 'ALL';
 
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET LOG_LEVEL = 'INFO';
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET TRACE_LEVEL = 'ALWAYS';
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET METRIC_LEVEL = 'ALL';
+ALTER SCHEMA SJEGOU_DB.DBT_PROD SET LOG_LEVEL = 'INFO';
+ALTER SCHEMA SJEGOU_DB.DBT_PROD SET TRACE_LEVEL = 'ALWAYS';
+ALTER SCHEMA SJEGOU_DB.DBT_PROD SET METRIC_LEVEL = 'ALL';
 
-CREATE OR REPLACE API INTEGRATION git_integration
+show integrations;
+
+use role accountadmin;
+CREATE OR REPLACE API INTEGRATION sjeg_git_integration_for_dbt
   API_PROVIDER = git_https_api
-  API_ALLOWED_PREFIXES = ('https://github.com/')
+  API_ALLOWED_PREFIXES = ('https://github.com/SJEG')
   ENABLED = TRUE;
+use role eul_int_consultant;
 
-CREATE OR REPLACE FILE FORMAT tasty_bytes_dbt_db.public.csv_ff 
+CREATE OR REPLACE FILE FORMAT SJEGOU_DB.public.csv_ff 
 type = 'csv';
 
-CREATE OR REPLACE STAGE tasty_bytes_dbt_db.public.s3load
+CREATE OR REPLACE STAGE SJEGOU_DB.public.s3load
 COMMENT = 'Quickstarts S3 Stage Connection'
 url = 's3://sfquickstarts/frostbyte_tastybytes/'
-file_format = tasty_bytes_dbt_db.public.csv_ff;
+file_format = SJEGOU_DB.public.csv_ff;
 
 /*--
  raw zone table build 
 --*/
 
 -- country table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.country
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.country
 (
     country_id NUMBER(18,0),
     country VARCHAR(16777216),
@@ -55,7 +59,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.country
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- franchise table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.franchise 
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.franchise 
 (
     franchise_id NUMBER(38,0),
     first_name VARCHAR(16777216),
@@ -68,7 +72,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.franchise
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- location table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.location
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.location
 (
     location_id NUMBER(19,0),
     placekey VARCHAR(16777216),
@@ -81,7 +85,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.location
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- menu table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.menu
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.menu
 (
     menu_id NUMBER(19,0),
     menu_type_id NUMBER(38,0),
@@ -98,7 +102,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.menu
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- truck table build 
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.truck
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.truck
 (
     truck_id NUMBER(38,0),
     menu_type_id NUMBER(38,0),
@@ -118,7 +122,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.truck
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- order_header table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_header
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.order_header
 (
     order_id NUMBER(38,0),
     truck_id NUMBER(38,0),
@@ -140,7 +144,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_header
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- order_detail table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_detail 
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.order_detail 
 (
     order_detail_id NUMBER(38,0),
     order_id NUMBER(38,0),
@@ -155,7 +159,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_detail
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- customer loyalty table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.customer_loyalty
+CREATE OR REPLACE TABLE SJEGOU_DB.raw.customer_loyalty
 (
     customer_id NUMBER(38,0),
     first_name VARCHAR(16777216),
@@ -180,36 +184,36 @@ COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1
 --*/
 
 -- country table load
-COPY INTO tasty_bytes_dbt_db.raw.country
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/country/;
+COPY INTO SJEGOU_DB.raw.country
+FROM @SJEGOU_DB.public.s3load/raw_pos/country/;
 
 -- franchise table load
-COPY INTO tasty_bytes_dbt_db.raw.franchise
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/franchise/;
+COPY INTO SJEGOU_DB.raw.franchise
+FROM @SJEGOU_DB.public.s3load/raw_pos/franchise/;
 
 -- location table load
-COPY INTO tasty_bytes_dbt_db.raw.location
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/location/;
+COPY INTO SJEGOU_DB.raw.location
+FROM @SJEGOU_DB.public.s3load/raw_pos/location/;
 
 -- menu table load
-COPY INTO tasty_bytes_dbt_db.raw.menu
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/menu/;
+COPY INTO SJEGOU_DB.raw.menu
+FROM @SJEGOU_DB.public.s3load/raw_pos/menu/;
 
 -- truck table load
-COPY INTO tasty_bytes_dbt_db.raw.truck
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/truck/;
+COPY INTO SJEGOU_DB.raw.truck
+FROM @SJEGOU_DB.public.s3load/raw_pos/truck/;
 
 -- customer_loyalty table load
-COPY INTO tasty_bytes_dbt_db.raw.customer_loyalty
-FROM @tasty_bytes_dbt_db.public.s3load/raw_customer/customer_loyalty/;
+COPY INTO SJEGOU_DB.raw.customer_loyalty
+FROM @SJEGOU_DB.public.s3load/raw_customer/customer_loyalty/;
 
 -- order_header table load
-COPY INTO tasty_bytes_dbt_db.raw.order_header
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_header/;
+COPY INTO SJEGOU_DB.raw.order_header
+FROM @SJEGOU_DB.public.s3load/raw_pos/order_header/;
 
 -- order_detail table load
-COPY INTO tasty_bytes_dbt_db.raw.order_detail
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_detail/;
+COPY INTO SJEGOU_DB.raw.order_detail
+FROM @SJEGOU_DB.public.s3load/raw_pos/order_detail/;
 
 -- setup completion note
-SELECT 'tasty_bytes_dbt_db setup is now complete' AS note;
+SELECT 'SJEGOU_DB setup is now complete' AS note;
